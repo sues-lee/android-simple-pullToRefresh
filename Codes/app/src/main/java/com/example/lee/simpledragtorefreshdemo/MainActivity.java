@@ -12,6 +12,7 @@ import com.example.lee.simpledragtorefreshdemo.Views.ReFreshListView;
 
 public class MainActivity extends Activity implements ReFreshListView.IRefreshListener {
     ReFreshListView listView;
+    Handler handler=new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +49,25 @@ public class MainActivity extends Activity implements ReFreshListView.IRefreshLi
 
     @Override
     public void onRefresh() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        listView.refreshComplete();         //刷新完成后调用停止方法
+        //模拟异步加载信息
+        Runnable loadInfo = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listView.refreshComplete();         //刷新完成后调用停止方法
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        new Thread(loadInfo).start();
+
     }
+
 }

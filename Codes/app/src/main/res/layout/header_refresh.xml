@@ -34,12 +34,13 @@
             android:layout_height="wrap_content"
             android:id="@+id/arrow"
             android:src="@drawable/arrowdown"
-            android:layout_below="@+id/progress"
+            android:layout_marginRight="20dp"
             android:layout_toLeftOf="@+id/linearLayout" />
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/progress"
+            android:layout_toLeftOf="@+id/linearLayout"
             android:visibility="gone"
             style="?android:attr/progressBarStyleSmall"
             android:layout_marginRight="20dp"

@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -35,6 +37,9 @@ import java.util.logging.LogRecord;
 public class ReFreshListView extends ListView implements AbsListView.OnScrollListener{
 
     View header;            //顶部布局文件
+    TextView tip;           //提示字符
+    ImageView arrow;        //箭头图片
+    ProgressBar progress;   //进度条
     int headerHeight;       //顶部布局文件的高度
     int firstVisibleItem;   //当前第一个可见的item的位置
     int scrollState;        //listview当前滚动状态
@@ -74,9 +79,7 @@ public class ReFreshListView extends ListView implements AbsListView.OnScrollLis
         initView(context);
 
     }
-    public void setHanlder(android.os.Handler handler){
-        this.handler = handler;
-    }
+
     /**
      * 添加顶部布局文件
      * */
@@ -89,6 +92,9 @@ public class ReFreshListView extends ListView implements AbsListView.OnScrollLis
         this.addHeaderView(header);     //添加布局文件
         this.setOnScrollListener(this);
 
+        tip = (TextView)header.findViewById(R.id.tip);
+        arrow = (ImageView)header.findViewById(R.id.arrow);
+        progress = (ProgressBar)header.findViewById(R.id.progress);
     }
 
     /**
@@ -142,10 +148,10 @@ public class ReFreshListView extends ListView implements AbsListView.OnScrollLis
                 break;
             case MotionEvent.ACTION_UP:
                 if(state == RELEASE){
-                    while(header.getPaddingTop()>50)
-                    {
-                        Log.i("LIXU","successtouch"+Integer.toString((int)(header.getPaddingTop() * 0.9)));
-                        topPadding((int)(header.getPaddingTop() * 0.9));
+//                    while(header.getPaddingTop()>50)
+//                    {
+//                        Log.i("LIXU","successtouch"+Integer.toString((int)(header.getPaddingTop() * 0.9)));
+//                        topPadding((int)(header.getPaddingTop() * 0.9));
 
 //                        try {
 //                            Thread.currentThread().sleep(50);
@@ -153,7 +159,7 @@ public class ReFreshListView extends ListView implements AbsListView.OnScrollLis
 //                            e.printStackTrace();
 //                        }
 
-                    }
+                    //}
 
                     //topPadding((int) ev.getY() - startY - headerHeight);
 //                    new Thread() {
@@ -177,13 +183,12 @@ public class ReFreshListView extends ListView implements AbsListView.OnScrollLis
 //                    }.start();
                     // handler.post(slowBack);     //将UI更新事件发送给主线程
 
-
-                    Log.i("LIXU","SB2");
                     state = REFRESHING;
                     //加载最新数据
                     refreshViewByState(state);
+                    //调用onFresh方法
                     iRefreshListener.onRefresh();
-                }else if(state==PULL){
+                }else if(state==PULL){      //在下拉状态抬起手指的动作
                     state = NONE;
                     isRemark = false;
                     refreshViewByState(state);
@@ -195,6 +200,7 @@ public class ReFreshListView extends ListView implements AbsListView.OnScrollLis
         }
         return super.onTouchEvent(ev);
     }
+
 
     /**
      * 判断移动过程中的操作，对当前状态进行转换
@@ -244,20 +250,17 @@ public class ReFreshListView extends ListView implements AbsListView.OnScrollLis
      * @param st
      */
     private void refreshViewByState(int st){
-        TextView tip = (TextView)header.findViewById(R.id.tip);
-        ImageView arrow = (ImageView)header.findViewById(R.id.arrow);
-        ProgressBar progress = (ProgressBar)header.findViewById(R.id.progress);
+
         //箭头反转动画
         RotateAnimation animation = new RotateAnimation(0,180,
                 RotateAnimation.RELATIVE_TO_SELF,0.5f,
                 RotateAnimation.RELATIVE_TO_SELF,0.5f);
-        animation.setDuration(500);
-        animation.setFillAfter(true);
+        animation.setDuration(200);
+        animation.setFillAfter(true);           //动画结束后不回到原位
         RotateAnimation animation1 = new RotateAnimation(180,0,
                 RotateAnimation.RELATIVE_TO_SELF,0.5f,
                 RotateAnimation.RELATIVE_TO_SELF,0.5f);
-        animation1.setDuration(500);
-        animation1.setFillAfter(true);
+        animation1.setDuration(200);
 
         switch (st){
             case  NONE:
